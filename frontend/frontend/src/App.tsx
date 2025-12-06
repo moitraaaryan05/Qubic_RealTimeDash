@@ -1,143 +1,97 @@
-import { useEffect, useState } from "react";
-
-type QubicEvent = {
-  tx_hash: string;
-  from_address: string;
-  to_address: string;
-  token: string;
-  amount: number;
-  event_type: string;
-  timestamp: string;
-};
+// src/App.tsx
+import { useMemo } from "react";
+import { useQubicData } from "./hooks/useQubicData";
+import { computeDashboardStats, buildTimeBuckets } from "./utils/metrics";
+import { StatsGrid } from "./components/dashboard/StatsGrid";
+import { TradesTable } from "./components/dashboard/TradesTable";
+import { VolumeChart } from "./components/charts/VolumeChart";
+import { TradesOverTimeChart } from "./components/charts/TradesOverTimeChart";
 
 function App() {
-  const [events, setEvents] = useState<QubicEvent[]>([]);
-  const [status, setStatus] = useState<"connecting" | "connected" | "error">(
-    "connecting"
-  );
+  const { events, status } = useQubicData("http://localhost:8000");
 
-  // Load initial history
-  useEffect(() => {
-    const loadInitial = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/api/metrics?limit=50");
-        const data = await res.json();
-        setEvents(data);
-      } catch (err) {
-        console.error("Failed to load initial metrics", err);
-      }
-    };
-    loadInitial();
-  }, []);
-
-  // WebSocket subscription
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8000/ws");
-
-    ws.onopen = () => {
-      setStatus("connected");
-      // Some servers require a ping; our backend ignores messages but keeps connection open
-      ws.send("hello from frontend");
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        if (msg.type === "new_event") {
-          const newEvent: QubicEvent = msg.data;
-          setEvents((prev) => [newEvent, ...prev].slice(0, 100));
-        }
-      } catch (err) {
-        console.error("Error parsing WS message", err);
-      }
-    };
-
-    ws.onerror = () => {
-      setStatus("error");
-    };
-
-    ws.onclose = () => {
-      setStatus("error");
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, []);
+  const stats = useMemo(() => computeDashboardStats(events), [events]);
+  const buckets = useMemo(() => buildTimeBuckets(events), [events]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
-      <header className="mb-6 flex items-center justify-between">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#020617",
+        color: "#e5e7eb",
+        padding: "16px",
+      }}
+    >
+      {/* Header */}
+      <header
+        style={{
+          marginBottom: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "12px",
+          flexWrap: "wrap",
+        }}
+      >
         <div>
-          <h1 className="text-2xl font-bold">
+          <h1 style={{ fontSize: "1.6rem", fontWeight: 700 }}>
             Qubic Real-Time Token Dashboard
           </h1>
-          <p className="text-sm text-slate-400">
-            Live stream of Qubic events via EasyConnect → FastAPI → WebSocket.
+          <p style={{ fontSize: "0.8rem", color: "#9ca3af", marginTop: 4 }}>
+            Live market activity streamed from EasyConnect → FastAPI → WebSocket.
           </p>
         </div>
-        <div
-          className={`px-3 py-1 rounded-full text-xs ${
-            status === "connected"
-              ? "bg-emerald-500/20 text-emerald-300"
-              : "bg-red-500/20 text-red-300"
-          }`}
-        >
-          WebSocket: {status}
+        <div>
+          <StatusPill status={status} />
         </div>
       </header>
 
-      <section className="bg-slate-900/60 rounded-xl p-4 shadow-lg border border-slate-800">
-        <h2 className="text-lg font-semibold mb-3">Latest Events</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-900">
-              <tr>
-                <th className="px-3 py-2 text-left">Time (UTC)</th>
-                <th className="px-3 py-2 text-left">Type</th>
-                <th className="px-3 py-2 text-left">Token</th>
-                <th className="px-3 py-2 text-left">Amount</th>
-                <th className="px-3 py-2 text-left">From</th>
-                <th className="px-3 py-2 text-left">To</th>
-                <th className="px-3 py-2 text-left">Tx Hash</th>
-              </tr>
-            </thead>
-            <tbody>
-              {events.map((e, idx) => (
-                <tr key={`${e.tx_hash}-${idx}`} className="border-t border-slate-800">
-                  <td className="px-3 py-2">
-                    {new Date(e.timestamp).toLocaleTimeString("en-GB", {
-                      hour12: false,
-                    })}
-                  </td>
-                  <td className="px-3 py-2 uppercase">{e.event_type}</td>
-                  <td className="px-3 py-2">{e.token}</td>
-                  <td className="px-3 py-2">{e.amount}</td>
-                  <td className="px-3 py-2 text-xs truncate max-w-[140px]">
-                    {e.from_address}
-                  </td>
-                  <td className="px-3 py-2 text-xs truncate max-w-[140px]">
-                    {e.to_address}
-                  </td>
-                  <td className="px-3 py-2 text-xs truncate max-w-[160px]">
-                    {e.tx_hash}
-                  </td>
-                </tr>
-              ))}
-              {events.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-3 py-4 text-center text-slate-500">
-                    No events yet. Once EasyConnect starts posting to the backend,
-                    they will appear here in real time.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      {/* Stats row */}
+      <section style={{ marginBottom: "16px" }}>
+        <StatsGrid stats={stats} />
+      </section>
+
+      {/* Charts row */}
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1.2fr 1fr",
+          gap: "16px",
+          marginBottom: "16px",
+        }}
+      >
+        <VolumeChart data={buckets} />
+        <TradesOverTimeChart data={buckets} />
+      </section>
+
+      {/* Trades table */}
+      <section>
+        <TradesTable events={events.slice(0, 100)} />
       </section>
     </div>
   );
 }
+
+type StatusProps = { status: string };
+
+const StatusPill: React.FC<StatusProps> = ({ status }) => {
+  const isOk = status === "connected" || status === "loading";
+  const bg = isOk ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)";
+  const color = isOk ? "#4ade80" : "#fca5a5";
+  return (
+    <div
+      style={{
+        padding: "6px 12px",
+        borderRadius: "999px",
+        fontSize: "0.75rem",
+        background: bg,
+        color,
+        border: `1px solid ${color}30`,
+      }}
+    >
+      WebSocket: {status}
+    </div>
+  );
+};
 
 export default App;
