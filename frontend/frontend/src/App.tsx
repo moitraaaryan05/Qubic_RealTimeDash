@@ -6,6 +6,7 @@ import { StatsGrid } from "./components/dashboard/StatsGrid";
 import { TradesTable } from "./components/dashboard/TradesTable";
 import { VolumeChart } from "./components/charts/VolumeChart";
 import { TradesOverTimeChart } from "./components/charts/TradesOverTimeChart";
+import "./App.css"
 
 function App() {
   const { events, status } = useQubicData("http://localhost:8000");
@@ -17,9 +18,9 @@ function App() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#020617",
+        background: "#05091dff",
         color: "#e5e7eb",
-        padding: "16px",
+        padding: "25px",
       }}
     >
       {/* Header */}
@@ -34,10 +35,10 @@ function App() {
         }}
       >
         <div>
-          <h1 style={{ fontSize: "1.6rem", fontWeight: 700 }}>
+          <h1 style={{ fontSize: "2.1rem", fontWeight: 730, fontFamily: "Century Gothic" }}>
             Qubic Real-Time Token Dashboard
           </h1>
-          <p style={{ fontSize: "0.8rem", color: "#9ca3af", marginTop: 4 }}>
+          <p style={{ fontSize: "1.1rem", color: "#cdd2daff", marginTop: 4, fontFamily:"Bahnschrift", marginLeft: "2rem" }}>
             Live market activity streamed from EasyConnect → FastAPI → WebSocket.
           </p>
         </div>
@@ -54,10 +55,10 @@ function App() {
       {/* Charts row */}
       <section
         style={{
-          display: "grid",
-          gridTemplateColumns: "1.2fr 1fr",
-          gap: "16px",
-          marginBottom: "16px",
+          display: "flex",
+          gap: "20px",
+          justifyContent: "space-between",
+          marginBottom: "35px",
         }}
       >
         <VolumeChart data={buckets} />
@@ -76,17 +77,17 @@ type StatusProps = { status: string };
 
 const StatusPill: React.FC<StatusProps> = ({ status }) => {
   const isOk = status === "connected" || status === "loading";
-  const bg = isOk ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)";
-  const color = isOk ? "#4ade80" : "#fca5a5";
+  const bg = isOk ? "rgba(34,197,94,0.34)" : "rgba(239, 68, 68, 0.34)";
+  const color = isOk ? "#74f7a4ff" : "#ffb9b9ff";
   return (
     <div
       style={{
         padding: "6px 12px",
         borderRadius: "999px",
-        fontSize: "0.75rem",
+        fontSize: "0.84rem",
         background: bg,
         color,
-        border: `1px solid ${color}30`,
+        border: `1.5px solid ${color}`,
       }}
     >
       WebSocket: {status}

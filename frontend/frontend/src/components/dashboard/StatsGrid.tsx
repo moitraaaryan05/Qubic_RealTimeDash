@@ -41,21 +41,31 @@ export const StatsGrid: React.FC<Props> = ({ stats }) => {
         <div
           key={card.label}
           style={{
-            background: "#0f172a",
             borderRadius: "12px",
-            padding: "16px",
+            padding: "7px",
             border: "1px solid #1e293b",
           }}
+          className="stat-grid"
         >
-          <div style={{ fontSize: "0.8rem", color: "#9ca3af" }}>
-            {card.label}
-          </div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 600, marginTop: 4 }}>
-            {card.value}
-          </div>
-          <div style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: 4 }}>
-            {card.sub}
-          </div>
+            <div 
+            style={{
+                background: "linear-gradient(to right, rgba(246, 96, 2, 1), rgba(247, 2, 141, 1))",
+                borderRadius: "10px",
+                padding: "16px",
+                boxShadow: "0px 0px 10px rgba(252, 252, 252, 0.47)",
+            }}
+            className="box-hover"
+            >
+                <div style={{ fontSize: "1rem", color: "#090909ff", fontWeight: 650 }}>
+                    {card.label}
+                </div>
+                <div style={{ fontSize: "1.6rem", fontWeight: 700, marginTop: 4 }}>
+                    {card.value}
+                </div>
+                <div style={{ fontSize: "0.8rem", color: "#020202ff", marginTop: 4 }}>
+                    {card.sub}
+                </div>
+            </div>
         </div>
       ))}
     </div>
