@@ -9,7 +9,7 @@ import { TradesOverTimeChart } from "./components/charts/TradesOverTimeChart";
 import "./App.css"
 
 function App() {
-  const { events, status } = useQubicData("http://localhost:8000");
+  const { events, status } = useQubicData("http://localhost:9000");
 
   const stats = useMemo(() => computeDashboardStats(events), [events]);
   const buckets = useMemo(() => buildTimeBuckets(events), [events]);
