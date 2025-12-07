@@ -6,7 +6,7 @@ type Status = "idle" | "loading" | "connected" | "error";
 
 // src/hooks/useQubicData.ts
 const DEFAULT_API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:9000";
 
 export function useQubicData(apiBase = DEFAULT_API_BASE) {
   const [events, setEvents] = useState<QubicEvent[]>([]);
