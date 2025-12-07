@@ -35,7 +35,7 @@ If you’re just reviewing the project and a live demo URL is available:
    - Display live or simulated events on the charts and table
 3. The video (with audio correctly added) has been added in the github repo as Qubic_RealTimeDash_video.mp4 in ./
 
-If you’d like to run it yourself or test locally, follow the steps below.
+
 
 ---
 
