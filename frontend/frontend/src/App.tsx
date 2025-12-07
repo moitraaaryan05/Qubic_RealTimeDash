@@ -9,7 +9,7 @@ import { TradesOverTimeChart } from "./components/charts/TradesOverTimeChart";
 import "./App.css"
 
 function App() {
-  const { events, status } = useQubicData("https://62fae0c2-57d9-4bea-9dd8-27b58e9cb7de-00-stusnslb19cr.riker.replit.dev:9000/");
+  const { events, status } = useQubicData("https://62fae0c2-57d9-4bea-9dd8-27b58e9cb7de-00-stusnslb19cr.riker.replit.dev:9000");
 
   const stats = useMemo(() => computeDashboardStats(events), [events]);
   const buckets = useMemo(() => buildTimeBuckets(events), [events]);
